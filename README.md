@@ -23,6 +23,7 @@ I built this home lab to create a virtual environment for practicing penetration
 
 ## Lab Architecture
 I fabricated and designed a segmented virtual network where the VMs could communicate with each other but remain isolated from the host network.
+
 <img src="https://i.imgur.com/KKj42hs.png[/img]"/>
 <img src="https://i.imgur.com/XLy7Ftz.png[/img]"/>
 <img src="https://i.imgur.com/Rqj6jGq.png[/img]"/>
@@ -64,6 +65,7 @@ I configured Splunk to ingest Sysmon logs by altering the "inputs.conf" located 
 <img src="https://i.imgur.com/Ac1pwDe.png[/img]"/>
 
 **inputs.conf Configuration Settings added:**
+
 <img src="https://i.imgur.com/hoY4mYQ.png[/img]"/>
 
 ### Index Creation
