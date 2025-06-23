@@ -27,7 +27,7 @@ I built this home lab to create a virtual environment for practicing penetration
 
 I fabricated and designed a segmented virtual network where the VMs could communicate with each other but remain isolated from the host network.
 ![Hyper-V Network](src/images/Hyper-V Network Config.png)
-<img src="https://imgur.com/SfmuWGV"/>
+<img src="https://imgur.com/KKj42hs"/>
 <img src="https://imgur.com/raKDuR6"/>
 
 ![Lab Architecture]([https://i.imgur.com/PLACEHOLDER.png]
