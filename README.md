@@ -1,4 +1,4 @@
-# Detection Lab
+# Malware Detection and Analysis Lab
 ## Project Overview
 I built this home lab to create a virtual environment for practicing penetration testing and security monitoring techniques within a Security Information and Event Management (SIEM) system. The main objective of this project is to simulate an attack scenario and conduct log analysis to identify Indicators of Compromise (IoCs). This project was fabricated to strengthen my knowledge of security concepts by acquiring hands-on experience constructing and deploying malware, analyzing logs, and increase familiarity with commonly used industry tools.
 
