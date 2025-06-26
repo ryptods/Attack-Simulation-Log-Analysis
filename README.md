@@ -22,7 +22,7 @@ I built this home lab to create a virtual environment for practicing penetration
 - Splunk
 
 ## Lab Architecture
-I fabricated and designed a segmented virtual network where the VMs could communicate with each other but remain isolated from the host network.
+I began by developing a segmented virtual network where the VMs could communicate while also remaining isolated from the host network.
 
 <img src="https://i.imgur.com/KKj42hs.png[/img]"/>
 <img src="https://i.imgur.com/XLy7Ftz.png[/img]"/>
